@@ -15,4 +15,6 @@ user.post('/register',upload.fields([
         }
     ]),userController.registerUser)
 
+user.post('/logIn', userController.loggedInUser)
+
 export default user

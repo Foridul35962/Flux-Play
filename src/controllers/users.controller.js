@@ -5,6 +5,7 @@ import { User } from '../models/user.models.js'
 import { uploadOnCloudinary } from '../utils/cloudinary.js'
 import { ApiResponse } from '../utils/ApiResponse.js'
 import { DeleteImage } from '../utils/deleteImage.js'
+import generateAccessAndRefreshToken from '../utils/Token.js'
 
 
 export const registerUser = [
@@ -85,3 +86,44 @@ export const registerUser = [
         })
     })
 ]
+
+
+export const loggedInUser = asyncHandler(async (req, res) => {
+    const { email, userName, password } = req.body
+
+    if (!userName || !email) {
+        throw new ApiErrors(401, "user or email is required")
+    }
+
+    //check: is user exist
+    const user = await User.findOne({
+        $or: [{ email }, { userName }]
+    })
+
+    if (!user) {
+        throw new ApiErrors(402, "User does not exist")
+    }
+
+    //check: is password correct
+    const validationPassword = await user.isPasswordCorrect(password)
+    if (!validationPassword) {
+        throw new ApiErrors(403, "Password is incorrect")
+    }
+
+    //create tokens
+    const { accessToken, refreshToken } = await generateAccessAndRefreshToken(user._id)
+
+    //sending cookies
+    const loggedInUser = await User.findById(user._id).select("-password -refreshToken")
+    const options = {
+        httpOnly: true,
+        secure: true
+    }
+    return res
+        .status(200)
+        .cookie("accessToken", accessToken, options)
+        .cookie("refreshToken", refreshToken, options)
+        .json(new ApiResponse(200, {
+            user: loggedInUser
+        }, "User LoggedIn successfully"))
+})
