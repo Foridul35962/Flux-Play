@@ -4,6 +4,8 @@ import cors from 'cors'
 
 //local file import
 import userRouter from './routers/users.router.js'
+import errorHandle from './utils/errorHandle.js'
+
 
 const app = express()
 
@@ -25,6 +27,9 @@ app.use(cookieParser())
 
 //router
 app.use('/api/v1/users',userRouter)
+
+//Global error handler
+app.use(errorHandle)
 
 
 export {app}
