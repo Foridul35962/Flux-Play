@@ -1,12 +1,21 @@
 import multer from "multer";
+import path from 'path'
+import fs from 'fs'
+
+const uploadDir = path.join(process.cwd(), 'src', 'public', 'upload')
+
+// ensure upload directory exists
+if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir, { recursive: true })
+}
 
 const fileStorage = multer.diskStorage({
-    destination:(req, file, cb)=>{
-        cb(null,'../public/upload')
+    destination: (req, file, cb) => {
+        cb(null, uploadDir)
     },
-    filename:(req, file, cb)=>{
-        cb(null, new Date().toISOString().replace(/:/g,'-')+'-'+file.originalname)
+    filename: (req, file, cb) => {
+        cb(null, new Date().toISOString().replace(/:/g, '-') + '-' + file.originalname)
     }
 })
 
-export const upload = multer({storage:fileStorage})
+export const upload = multer({ storage: fileStorage })
