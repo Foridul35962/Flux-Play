@@ -1,6 +1,7 @@
 import express from "express"
 import * as userController from '../controllers/users.controller.js'
 import { upload } from "../middlewares/multer.middleware.js"
+import { verifyJWS } from "../middlewares/auth.middleware.js"
 
 const user = express.Router()
 
@@ -16,5 +17,6 @@ user.post('/register',upload.fields([
     ]),userController.registerUser)
 
 user.post('/logIn', userController.loggedInUser)
+user.post('/logOut', verifyJWS, userController.loggedOutUser)
 
 export default user
