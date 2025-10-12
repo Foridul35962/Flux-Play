@@ -18,5 +18,6 @@ user.post('/register',upload.fields([
 
 user.post('/logIn', userController.loggedInUser)
 user.post('/logOut', verifyJWS, userController.loggedOutUser)
+user.post('/restore-token', userController.refreshAccessToken)
 
 export default user
