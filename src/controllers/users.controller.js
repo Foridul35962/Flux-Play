@@ -163,25 +163,109 @@ export const refreshAccessToken = asyncHandler(async (req, res) => {
         if (!user) {
             throw new ApiErrors(401, "Invalid refresh token")
         }
-    
+
         if (incomingRefreshToken !== user.refreshToken) {
             throw new ApiErrors(401, "Refresh token is expired")
         }
-    
+
         const { accessToken } = await generateAccessAndRefreshToken(user._id, true)
         const options = {
-            httpOnly : true,
-            secure : true
+            httpOnly: true,
+            secure: true
         }
-    
+
         return res
             .status(200)
             .cookie("accessToken", accessToken, options)
             .cookie("refreshToken", incomingRefreshToken, options)
             .json(
-                new ApiResponse(201,{accessToken, refreshToken: incomingRefreshToken}, "Access Token refreshed")
+                new ApiResponse(201, { accessToken, refreshToken: incomingRefreshToken }, "Access Token refreshed")
             )
     } catch (error) {
         throw new ApiErrors(401, error?.message || "Invalid refresh token")
     }
 })
+
+export const changePassword = [
+    check('oldPassword')
+        .notEmpty()
+        .withMessage('Old Password must be required'),
+
+    check('newPassword')
+        .isLength({ min: 8 })
+        .matches(/[a-zA-Z]/)
+        .withMessage('Password mush be has one alphabet')
+        .matches(/[0-9]/)
+        .withMessage('Password mush be has one number')
+        .trim(),
+
+    check('confirm_password')
+        .trim()
+        .custom((value, { req }) => {
+            if (value !== req.body.newPassword) {
+                throw new Error("Password not matched")
+            }
+            return true
+        }),
+
+    asyncHandler(async (req, res) => {
+        const error = validationResult(req)
+        if (!error.isEmpty()) {
+            throw new ApiErrors(400, 'Insert wrong value', error.array())
+        }
+
+        const { oldPassword, newPassword } = req.body
+
+        const user = await User.findById(req.user?._id)
+        if (!user) {
+            throw new ApiErrors(401, "Unauthorize access")
+        }
+
+        const checkPassword = await user.isPasswordCorrect(oldPassword)
+        if (!checkPassword) {
+            throw new ApiErrors(400, "Invalid Password")
+        }
+
+        user.password = newPassword
+        await user.save({ validateBeforeSave: false })
+
+        return res
+            .status(200)
+            .json(
+                new ApiResponse(200, {}, "Password changed successfully")
+            )
+    })
+]
+
+export const updateUserDetails = [
+    check('userName')
+        .notEmpty()
+        .withMessage('user name is required')
+        .trim()
+        .isLength({ min: 5 })
+        .withMessage('UserName must be at least 5 charecter'),
+    check('email')
+        .notEmpty()
+        .withMessage('email is required')
+        .isEmail()
+        .withMessage('Need a valid Email')
+        .normalizeEmail(),
+
+    asyncHandler(async (req, res, next) => {
+        const error = validationResult(req)
+        if (!error.isEmpty()) {
+            new ApiErrors(400, "Insert wrong value", error.array())
+        }
+
+        const { userName, email } = req.body
+        const user = await User.findByIdAndUpdate(req.user?._id, {
+            $set: { userName, email }
+        }, { new: true }).select("-password -refreshToken")
+
+        return res
+            .status(200)
+            .json(
+                new ApiResponse(200, user, "Update user details is successfully")
+            )
+    })
+]
