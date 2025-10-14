@@ -269,3 +269,53 @@ export const updateUserDetails = [
             )
     })
 ]
+
+export const updateAvatar = asyncHandler(async (req, res)=>{
+    const avatarLocalPath = req.file?.path
+    if (!avatarLocalPath) {
+        throw new ApiErrors(400, "avatar image is require")
+    }
+
+    const uploadedImage = await uploadOnCloudinary(avatarLocalPath)
+    if (!uploadedImage) {
+        throw new ApiErrors(400, "Avatar image uploaded fail")
+    }
+
+    const user = await User.findByIdAndUpdate(req.user?._id,{
+        $set:{avatar:uploadedImage.url}
+    },{new: true}).select("-password -refreshToken")
+    if (!user) {
+        throw new ApiErrors(400, "Avatar image update on database failed")
+    }
+
+    return res
+        .status(200)
+        .json(
+            new ApiResponse(200, user, "Avatar image update successfully")
+        )
+})
+
+export const updateCoverImage = asyncHandler(async (req, res)=>{
+    const coverImageLocalPath = req.file?.path
+    if (!coverImageLocalPath) {
+        throw new ApiErrors(400, "Cover Image is require")
+    }
+
+    const uploadedCoverImage = await uploadOnCloudinary(coverImageLocalPath)
+    if (!updateCoverImage) {
+        throw new ApiErrors(400, "Cover Image uploaded failed")
+    }
+
+    const user = await User.findByIdAndUpdate(req.user?._id, {
+        $set:{coverImage: updateCoverImage.url}
+    },{new: true}).select("-password -refreshToken")
+    if (!user) {
+        throw new ApiErrors(400, "Cover Image updated on database failed")
+    }
+
+    return res
+        .status(200)
+        .json(
+            new ApiResponse(200, user, "Cover Image is updated successfully")
+        )
+})

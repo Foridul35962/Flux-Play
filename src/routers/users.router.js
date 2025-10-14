@@ -21,5 +21,7 @@ user.post('/logOut', verifyJWS, userController.loggedOutUser)
 user.post('/restore-token', userController.refreshAccessToken)
 user.post('/change-password', verifyJWS, userController.changePassword)
 user.post('/update-user-details', verifyJWS, userController.updateUserDetails)
+user.post('/update-avatar',upload.single("avatar"), verifyJWS, userController.updateAvatar)
+user.post('/update-cover-image',upload.single("coverImage"), verifyJWS, userController.updateAvatar)
 
 export default user
