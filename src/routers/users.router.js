@@ -23,5 +23,6 @@ user.post('/change-password', verifyJWS, userController.changePassword)
 user.post('/update-user-details', verifyJWS, userController.updateUserDetails)
 user.post('/update-avatar',upload.single("avatar"), verifyJWS, userController.updateAvatar)
 user.post('/update-cover-image',upload.single("coverImage"), verifyJWS, userController.updateCoverImage)
+user.get('/channel-profile/:userName', verifyJWS, userController.userChannelProfile)
 
 export default user
