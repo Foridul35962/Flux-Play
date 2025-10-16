@@ -20,9 +20,10 @@ user.post('/logIn', userController.loggedInUser)
 user.post('/logOut', verifyJWS, userController.loggedOutUser)
 user.post('/restore-token', userController.refreshAccessToken)
 user.post('/change-password', verifyJWS, userController.changePassword)
-user.post('/update-user-details', verifyJWS, userController.updateUserDetails)
-user.post('/update-avatar',upload.single("avatar"), verifyJWS, userController.updateAvatar)
-user.post('/update-cover-image',upload.single("coverImage"), verifyJWS, userController.updateCoverImage)
+user.patch('/update-user-details', verifyJWS, userController.updateUserDetails)
+user.patch('/update-avatar', verifyJWS, upload.single("avatar"), userController.updateAvatar)
+user.patch('/update-cover-image', verifyJWS, upload.single("coverImage"), userController.updateCoverImage)
 user.get('/channel-profile/:userName', verifyJWS, userController.userChannelProfile)
+user.get('/watch-history', verifyJWS, userController.getWatchHistory)
 
 export default user
