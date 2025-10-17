@@ -5,6 +5,7 @@ import cors from 'cors'
 //local file import
 import userRouter from './routers/users.router.js'
 import errorHandle from './utils/errorHandle.js'
+import commentRouter from './routers/comments.router.js'
 
 
 const app = express()
@@ -26,7 +27,8 @@ app.use(express.static('public'))
 app.use(cookieParser())
 
 //router
-app.use('/api/v1/users',userRouter)
+app.use('/api/v1/users', userRouter)
+app.use('/api/v1/comments', commentRouter)
 
 //Global error handler
 app.use(errorHandle)
