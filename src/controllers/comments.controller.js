@@ -30,9 +30,9 @@ export const getVideoComments = asyncHandler(async (req, res) => {
                 localField: '_id',
                 foreignField: 'video',
                 as: 'comments',
-                pipeline:[
+                pipeline: [
                     {
-                        $sort: {createdAt: -1}
+                        $sort: { createdAt: -1 }
                     },
                     {
                         $skip: skip
@@ -41,20 +41,20 @@ export const getVideoComments = asyncHandler(async (req, res) => {
                         $limit: limitNumber
                     },
                     {
-                        $project:{
+                        $project: {
                             content: 1,
                             owner: 1
                         }
                     },
                     {
-                        $lookup:{
+                        $lookup: {
                             from: 'users',
                             localField: 'owner',
                             foreignField: '_id',
                             as: 'owner',
-                            pipeline:[
+                            pipeline: [
                                 {
-                                    $project:{
+                                    $project: {
                                         userName: 1,
                                         avatar: 1
                                     }
@@ -63,13 +63,13 @@ export const getVideoComments = asyncHandler(async (req, res) => {
                         }
                     },
                     {
-                        $unwind:{
+                        $unwind: {
                             path: '$owner',
                             preserveNullAndEmptyArrays: true
                         }
                     },
                     {
-                        $project:{
+                        $project: {
                             content: 1,
                             owner: 1,
                             createdAt: 1
@@ -92,9 +92,9 @@ export const getVideoComments = asyncHandler(async (req, res) => {
 
 })
 
-export const addComment = asyncHandler(async (req, res)=>{
-    const {content, videoId} = req.body
-    const {_id} = req.user
+export const addComment = asyncHandler(async (req, res) => {
+    const { content, videoId } = req.body
+    const { _id } = req.user
     if (!content || !videoId) {
         throw new ApiErrors(400, "content and video Id both are required")
     }
@@ -115,13 +115,13 @@ export const addComment = asyncHandler(async (req, res)=>{
         )
 })
 
-export const updateComment = asyncHandler(async (req, res)=>{
-    const {_id, content} = req.body
+export const updateComment = asyncHandler(async (req, res) => {
+    const { _id, content } = req.body
     const userId = req.user?._id
     const isCommentUpdated = await Comments.findOneAndUpdate(
-        {_id, owner: userId},
-        {content},
-        {new: true}
+        { _id, owner: userId },
+        { content },
+        { new: true }
     )
     if (!isCommentUpdated) {
         throw new ApiErrors(404, "Comment not found")
@@ -134,12 +134,12 @@ export const updateComment = asyncHandler(async (req, res)=>{
         )
 })
 
-export const deleteComment = asyncHandler(async (req, res)=>{
-    const {_id} = req.body
+export const deleteComment = asyncHandler(async (req, res) => {
+    const { _id } = req.body
     const userId = req.user?._id
 
     const isDeleted = await Comments.findOneAndDelete(
-        {_id, owner: userId}
+        { _id, owner: userId }
     )
 
     if (!isDeleted) {

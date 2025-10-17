@@ -11,7 +11,8 @@ const LikesSchema = new mongoose.Schema({
     },
     likedBy: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "users"
+        ref: "users",
+        unique: true
     }
 }, { timestamps: true })
 
