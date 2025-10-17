@@ -7,6 +7,7 @@ import userRouter from './routers/users.router.js'
 import errorHandle from './utils/errorHandle.js'
 import commentRouter from './routers/comments.router.js'
 import likeRouter from './routers/likes.router.js'
+import playlistRouter from './routers/playlists.router.js'
 
 
 const app = express()
@@ -31,6 +32,7 @@ app.use(cookieParser())
 app.use('/api/v1/users', userRouter)
 app.use('/api/v1/comments', commentRouter)
 app.use('/api/v1/likes', likeRouter)
+app.use('/api/v1/playlists', playlistRouter)
 
 //Global error handler
 app.use(errorHandle)
