@@ -239,7 +239,7 @@ export const updateVideo = asyncHandler(async (req, res) => {
     })
 
     if (!isUserValid) {
-        DeleteImage(videoFileLocalPath, thumbnailLocalPath)
+        new DeleteImage(videoFileLocalPath, thumbnailLocalPath)
         throw new ApiErrors(404, "video not found")
     }
 
