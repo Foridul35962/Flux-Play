@@ -8,6 +8,7 @@ import errorHandle from './utils/errorHandle.js'
 import commentRouter from './routers/comments.router.js'
 import likeRouter from './routers/likes.router.js'
 import playlistRouter from './routers/playlists.router.js'
+import subscribeRouter from './routers/subscribes.router.js'
 
 
 const app = express()
@@ -33,6 +34,7 @@ app.use('/api/v1/users', userRouter)
 app.use('/api/v1/comments', commentRouter)
 app.use('/api/v1/likes', likeRouter)
 app.use('/api/v1/playlists', playlistRouter)
+app.use('/api/v1/subscribe', subscribeRouter)
 
 //Global error handler
 app.use(errorHandle)
