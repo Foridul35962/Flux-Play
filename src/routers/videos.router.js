@@ -19,5 +19,7 @@ video.post('/publish', upload.fields([
     ]), videoController.publishVideo)
 video.get('/get-video/:videoId', videoController.getVideoById)
 video.patch('/toggle-public-status/:videoId', videoController.togglePublishedStatus)
+video.delete('/delete/:videoId', videoController.deleteVideo)
+video.patch('/update/:videoId', videoController.updateVideo)
 
 export default video

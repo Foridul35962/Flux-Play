@@ -3,7 +3,8 @@ import { Video } from "../models/video.models.js";
 import mongoose from "mongoose";
 import { ApiErrors } from "../utils/ApiErrors.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
-import { uploadOnCloudinary } from "../utils/cloudinary.js";
+import { uploadOnCloudinary, deleteFromCloudinary } from "../utils/cloudinary.js";
+import { DeleteImage } from "../utils/deleteImage.js";
 
 export const getAllVideos = asyncHandler(async (req, res) => {
     const {
@@ -123,7 +124,9 @@ export const publishVideo = asyncHandler(async (req, res) => {
         description,
         duration,
         videoFile: videoUpload.url,
+        videoFilePublicId: videoUpload.public_id,
         thumbnail: thumbnailUpload.url,
+        thumbnailPublicId: thumbnailUpload.public_id,
         owner: userId
     })
 
@@ -173,7 +176,7 @@ export const togglePublishedStatus = asyncHandler(async (req, res) => {
             owner: userId
         }
     )
-    
+
     if (!video) {
         throw new ApiErrors(404, "Video not found or you are not the owner")
     }
@@ -188,3 +191,89 @@ export const togglePublishedStatus = asyncHandler(async (req, res) => {
         )
 })
 
+export const deleteVideo = asyncHandler(async (req, res) => {
+    const { videoId } = req.params
+    const userId = req.user?._id
+    if (!videoId) {
+        throw new ApiErrors(400, "video id is required")
+    }
+
+    const deleteVideo = await Video.findOne({
+        _id: videoId,
+        owner: userId
+    })
+
+    if (!deleteVideo) {
+        throw new ApiErrors(400, "video not found or you are not owner")
+    }
+
+    const deleteVideoFromCloud = await deleteFromCloudinary(deleteVideo.videoFilePublicId)
+    const deleteThumbnailFromCloud = await deleteFromCloudinary(deleteVideo.thumbnailPublicId)
+
+    await Video.findByIdAndDelete(videoId)
+
+    return res
+        .status(200)
+        .json(
+            new ApiResponse(200, {}, "video delete successfully")
+        )
+})
+
+export const updateVideo = asyncHandler(async (req, res) => {
+    const {videoId} = req.params
+    const userId = req.user?._id
+    if (!videoId) {
+        throw new ApiErrors(400, "video Id is required")
+    }
+
+    const videoFileLocalPath = req.files?.videoFile?.[0]?.path
+    const thumbnailLocalPath = req.files?.thumbnail?.[0]?.path
+    
+    if (!videoFileLocalPath && !thumbnailLocalPath) {
+        throw new ApiErrors(400, "video file and thumbnail is required")
+    }
+    
+    const isUserValid = await Video.findOne({
+        _id: videoId,
+        owner: userId
+    })
+
+    if (!isUserValid) {
+        DeleteImage(videoFileLocalPath, thumbnailLocalPath)
+        throw new ApiErrors(404, "video not found")
+    }
+
+    let updatedData = {}
+
+    //for update video
+    if (videoFileLocalPath) {
+        const updatedCloudVideo = await uploadOnCloudinary(videoFileLocalPath)
+        await deleteFromCloudinary(isUserValid.videoFilePublicId)
+        updatedData.videoFile = updatedCloudVideo.url
+        updatedData.videoFilePublicId = updatedCloudVideo.public_id
+    }
+
+    //for update thumbnail
+    if (thumbnailLocalPath) {
+        const updatedCloudThumbnail = await uploadOnCloudinary(thumbnailLocalPath)
+        await deleteFromCloudinary(isUserValid.thumbnailPublicId)
+        updatedData.thumbnail = updatedCloudThumbnail.url
+        updatedData.thumbnailPublicId = updatedCloudThumbnail.public_id
+    }
+
+    const updatedVideo = await Video.findByIdAndUpdate(
+        videoId, updatedData,
+        {new: true}
+    )
+
+    if (!updatedVideo) {
+        throw new ApiErrors(400, "video updated failed")
+    }
+
+    return res
+        .status(200)
+        .json(
+            new ApiResponse(200, updatedVideo, "video updated successfully")
+        )
+
+})
