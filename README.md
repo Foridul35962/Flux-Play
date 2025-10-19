@@ -1,32 +1,31 @@
-# Flux-Play  
+# 🎬 Flux-Play (Backend)
 
-## 🧩 Project Overview  
-Flux-Play is a lightweight JavaScript application aimed at delivering a seamless, interactive media-player experience. It supports basic playback controls, playlist handling, and a clean UI that's easy to integrate in your project or webpage.  
+## 🧩 Overview  
+**Flux-Play** is a scalable **Node.js + Express backend** for a full-stack video streaming platform.  
+It provides a robust RESTful API for **user authentication, video upload & management, likes, comments, and subscriptions** — built with production-ready architecture and clean modular design.
 
-## 🔍 Features  
-- Play, pause, stop media playback  
-- Load and switch between multiple tracks or media items  
-- Clean and responsive UI layout  
-- Simple code structure, easy to extend  
-- Built with pure JavaScript (no heavy framework dependencies)  
+---
 
-## 🎯 Why Use Flux-Play?  
-If you’re looking for a minimal-footprint media player that you can embed or customise, Flux-Play gives you:  
-- A starting point without having to build everything from scratch  
-- Flexibility to modify UI/UX as per your design  
-- Clean codebase that’s approachable even if you’re newer to JS media APIs  
+## 🚀 Features  
 
-## 🛠️ Getting Started  
+- ⚙️ **RESTful API Design** following MVC pattern  
+- 🔐 **JWT Authentication** for secure login & access  
+- 💾 **Video & Thumbnail Upload** using Multer  
+- 🧠 **MongoDB Aggregation Pipelines** for advanced queries  
+- 🧩 Modular architecture with reusable controllers and services  
+- 🚀 Custom error handling middleware and async utilities  
+- 🧷 Secure routes with user authorization  
+- 📜 Well-structured code for scalability and maintainability  
 
-### Prerequisites  
-- Node.js (for development / build tasks)  
-- A modern web browser  
+---
 
-### Installation  
-```bash
-# clone the repo  
-git clone https://github.com/Foridul35962/Flux-Play.git  
-cd Flux-Play  
+## 🏗️ Tech Stack  
 
-# install dependencies  
-npm install
+| Technology | Purpose |
+|-------------|----------|
+| **Node.js** | Runtime environment |
+| **Express.js** | Server-side framework |
+| **MongoDB + Mongoose** | Database & schema modeling |
+| **JWT (JSON Web Token)** | Authentication & authorization |
+| **Multer** | File upload handling |
+| **Cloudinary / Local Storage** | Media storage (if integrated) |
